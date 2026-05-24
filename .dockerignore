@@ -1,0 +1,54 @@
+# Docker ignore — keeps the build context small and fast.
+# Mirrors .gitignore but also excludes Docker/IDE artifacts.
+
+# Secrets — never bake into image
+.env
+
+# Dataset — mount at runtime via -v or GCS FUSE
+data/raw/
+data/processed/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments — image uses its own .venv
+.venv/
+venv/
+env/
+
+# uv lockfile (deps resolved from pyproject.toml in builder)
+uv.lock
+
+# IDE / OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# Git
+.git/
+.gitignore
+
+# Docker itself
+Dockerfile
+.dockerignore
+
+# CI / docs
+*.md

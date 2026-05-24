@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
 # ---------------------------------------------------------------------------
@@ -104,3 +105,16 @@ from src.api.routes.search import router as search_router  # noqa: E402
 app.include_router(search_router, prefix="")
 app.include_router(health_router, prefix="")
 app.include_router(images_router, prefix="")
+
+# ---------------------------------------------------------------------------
+# Static frontend — served at /ui to avoid clashing with API routes.
+# Open http://<host>:8000/ui/ in a browser.
+# Falls back gracefully if the frontend/ dir is missing (e.g. API-only mode).
+# ---------------------------------------------------------------------------
+import os  # noqa: E402
+
+_FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend")
+_FRONTEND_DIR = os.path.abspath(_FRONTEND_DIR)
+
+if os.path.isdir(_FRONTEND_DIR):
+    app.mount("/ui", StaticFiles(directory=_FRONTEND_DIR, html=True), name="frontend")

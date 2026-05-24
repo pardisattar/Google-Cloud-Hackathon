@@ -6,7 +6,11 @@
 'use strict';
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const API_BASE = 'http://localhost:8000';
+// When served by FastAPI at /ui, use the same origin (empty string = relative).
+// When opened from a local file:// or python -m http.server, fall back to localhost.
+const API_BASE = (window.location.hostname === 'localhost' && window.location.port === '3000')
+  ? 'http://localhost:8000'
+  : window.location.origin.replace(/\/$/, '');
 
 // ── State ────────────────────────────────────────────────────────────────────
 let topKValue        = 10;
