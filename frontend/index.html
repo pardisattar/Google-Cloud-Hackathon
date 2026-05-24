@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fashion Finder — AI Clothing Search</title>
+  <meta name="description" content="Upload a garment photo and instantly find visually similar clothing items powered by FashionCLIP and Pinecone vector search.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================================================================
+       HEADER
+  ================================================================ -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">✦</span>
+      <span class="logo-text">Fashion Finder</span>
+    </div>
+    <div class="health-indicator" id="healthIndicator">
+      <span class="dot" id="healthDot"></span>
+      <span id="healthText">checking...</span>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       MAIN LAYOUT
+  ================================================================ -->
+  <main class="app-layout">
+
+    <!-- ────────────────── LEFT PANEL ────────────────── -->
+    <aside class="left-panel">
+
+      <!-- Upload Zone -->
+      <section class="upload-section">
+        <h2 class="panel-title">Upload Garment</h2>
+        <div class="upload-zone" id="uploadZone" role="button" tabindex="0"
+             aria-label="Upload garment image. Click or drag and drop.">
+          <input type="file" id="fileInput" accept="image/*" hidden aria-hidden="true">
+
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <div class="upload-icon-wrap">
+              <span class="upload-arrow">↑</span>
+            </div>
+            <p class="upload-label">Drag & drop or <span class="link-text">browse</span></p>
+            <p class="upload-hint">JPG · PNG · WEBP</p>
+          </div>
+
+          <div class="preview-wrap" id="previewWrap" hidden>
+            <img id="imagePreview" class="image-preview" alt="Selected garment">
+            <button class="clear-btn" id="clearBtn" aria-label="Remove image">✕ Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Form -->
+      <section class="filter-section">
+        <h2 class="panel-title">
+          Filters
+          <span class="optional-tag">optional</span>
+        </h2>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label" for="categorySelect">Category</label>
+          <div class="select-wrap">
+            <select id="categorySelect" class="form-select">
+              <option value="">Any category</option>
+              <option value="short sleeve top">Short sleeve top</option>
+              <option value="long sleeve top">Long sleeve top</option>
+              <option value="short sleeve outwear">Short sleeve outwear</option>
+              <option value="long sleeve outwear">Long sleeve outwear</option>
+              <option value="vest">Vest</option>
+              <option value="sling">Sling</option>
+              <option value="shorts">Shorts</option>
+              <option value="trousers">Trousers</option>
+              <option value="skirt">Skirt</option>
+              <option value="short sleeve dress">Short sleeve dress</option>
+              <option value="long sleeve dress">Long sleeve dress</option>
+              <option value="vest dress">Vest dress</option>
+              <option value="sling dress">Sling dress</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+        </div>
+
+        <!-- Season -->
+        <div class="form-group">
+          <label class="form-label" for="seasonSelect">Season</label>
+          <div class="select-wrap">
+            <select id="seasonSelect" class="form-select">
+              <option value="">Any season</option>
+              <option value="spring">🌸 Spring</option>
+              <option value="summer">☀️ Summer</option>
+              <option value="autumn">🍂 Autumn</option>
+              <option value="winter">❄️ Winter</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+        </div>
+
+        <!-- Formality Dual Slider -->
+        <div class="form-group">
+          <label class="form-label">
+            Formality
+            <span class="range-values">
+              <span id="formalityMinDisplay">0.00</span>
+              <span class="range-sep">–</span>
+              <span id="formalityMaxDisplay">1.00</span>
+            </span>
+          </label>
+          <div class="dual-slider" id="dualSlider">
+            <input type="range" id="formalityMin" min="0" max="1" step="0.05" value="0"
+                   aria-label="Minimum formality">
+            <input type="range" id="formalityMax" min="0" max="1" step="0.05" value="1"
+                   aria-label="Maximum formality">
+          </div>
+          <div class="formality-labels">
+            <span>Casual</span>
+            <span>Formal</span>
+          </div>
+        </div>
+
+        <!-- Viewpoint -->
+        <div class="form-group">
+          <label class="form-label">Viewpoint</label>
+          <div class="toggle-group" id="viewpointToggle" role="group" aria-label="Viewpoint selection">
+            <button class="toggle-btn active" data-value="" id="vpAny">Any</button>
+            <button class="toggle-btn" data-value="1" id="vpFront">Front</button>
+            <button class="toggle-btn" data-value="2" id="vpSide">Side</button>
+            <button class="toggle-btn" data-value="3" id="vpBack">Back</button>
+          </div>
+        </div>
+
+        <!-- Results Count -->
+        <div class="form-group">
+          <label class="form-label" for="topKDisplay">Results to show</label>
+          <div class="stepper" role="group" aria-label="Number of results">
+            <button class="stepper-btn" id="topKDown" aria-label="Decrease results">−</button>
+            <span id="topKDisplay" class="stepper-value" aria-live="polite">10</span>
+            <button class="stepper-btn" id="topKUp" aria-label="Increase results">+</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <button class="search-btn" id="searchBtn" disabled>
+          <span id="searchBtnText">Search</span>
+          <span id="searchBtnSpinner" class="btn-spinner" hidden></span>
+          <span id="searchBtnSpinnerText" hidden>Analyzing...</span>
+        </button>
+
+        <button class="reset-btn" id="resetBtn">Reset filters</button>
+      </section>
+
+    </aside>
+
+    <!-- ────────────────── RIGHT PANEL ────────────────── -->
+    <section class="right-panel" aria-live="polite" aria-atomic="false">
+
+      <!-- Status Bar -->
+      <div class="status-bar" id="statusBar" hidden>
+        <span class="status-dot-small"></span>
+        <span id="statusText"></span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="state-container empty-state" id="emptyState">
+        <div class="state-icon">✦</div>
+        <p class="state-title">Ready to discover</p>
+        <p class="state-sub">Upload a garment photo to find similar items in the catalog</p>
+      </div>
+
+      <!-- Loading State -->
+      <div class="state-container loading-state" id="loadingState" hidden>
+        <div class="spinner"></div>
+        <p class="state-title">Analyzing garment...</p>
+        <p class="state-sub">Segmenting, extracting features, searching vectors</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="state-container error-state" id="errorState" hidden>
+        <div class="state-icon error-icon">⚠</div>
+        <p class="state-title">Something went wrong</p>
+        <p class="state-sub" id="errorMessage"></p>
+        <button class="retry-btn" id="retryBtn">Try again</button>
+      </div>
+
+      <!-- Results Grid -->
+      <div class="results-grid" id="resultsGrid" hidden></div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

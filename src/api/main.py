@@ -98,7 +98,9 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 from src.api.routes.health import router as health_router  # noqa: E402
+from src.api.routes.images import router as images_router  # noqa: E402
 from src.api.routes.search import router as search_router  # noqa: E402
 
 app.include_router(search_router, prefix="")
 app.include_router(health_router, prefix="")
+app.include_router(images_router, prefix="")
