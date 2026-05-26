@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en"><link type="text/css" id="dark-mode" rel="stylesheet" href=""><style type="text/css" id="dark-mode-custom-style"></style><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Finder - The Journey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <!-- Space Mono for the "Coding/Game" feel, Outfit for sleek modern tech, Righteous for neon headers -->
+    <link href="Fashion%20Finder%20-%20The%20Journey_files/css2.css" rel="stylesheet">
+    <link rel="stylesheet" href="Fashion%20Finder%20-%20The%20Journey_files/all.min.css">
+    <style>
+        :root {
+            /* Neon Game / Google Cloud Colors */
+            --g-blue: #4285F4;
+            --g-red: #EA4335;
+            --g-yellow: #FBBC04;
+            --g-green: #34A853;
+            --neon-pink: #FF007F;
+            --neon-cyan: #00F3FF;
+            
+            /* Dark Tech Backgrounds */
+            --bg-void: #0a0a0f;
+            --bg-grid: rgba(255, 255, 255, 0.03);
+            --glass-bg: rgba(20, 20, 25, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            
+            /* Text */
+            --text-main: #FFFFFF;
+            --text-dim: #A0A0B0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-void);
+            /* Tech Grid Background */
+            background-image: 
+                linear-gradient(var(--bg-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+            background-size: 30px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            padding: 60px 0;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* -----------------------------------
+           THE SLIDE (THE GAME SCREEN)
+        ------------------------------------ */
+        .slide {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            overflow: hidden;
+            padding: 50px 70px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px;
+            background: radial-gradient(circle at center, rgba(30,30,40,0.8) 0%, rgba(10,10,15,1) 100%);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 0 1px var(--glass-border);
+        }
+
+        /* Scanline Overlay for Game Effect */
+        .slide::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Interactive Glitter Canvas */
+        .glitter-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Crucial: lets mouse events pass through to buttons/cards */
+            z-index: 1; /* Sit above the background, but below content */
+        }
+        
+        /* Make sure all content sits above the glitter canvas */
+        .slide > *:not(.glitter-canvas) {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Typography */
+        h1, h2.slide-title { font-family: 'Righteous', cursive; letter-spacing: 2px; }
+        h1 { font-size: 85px; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        h2.slide-title { font-size: 48px; margin-bottom: 40px; color: var(--text-main); display: flex; align-items: center; gap: 15px;}
+        h2.slide-title::before { content: "►"; color: var(--neon-cyan); font-size: 30px; text-shadow: 0 0 10px var(--neon-cyan);}
+        
+        h3 { font-size: 26px; font-weight: 800; margin-bottom: 15px; }
+        p, li { font-size: 18px; line-height: 1.6; color: var(--text-dim); }
+        strong { color: var(--text-main); font-weight: 800; }
+        
+        /* Game Code Font Elements */
+        .code-font { font-family: 'Space Mono', monospace; font-size: 14px; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 1px;}
+
+        /* Glassmorphism Cards (Game Menus) */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 20;
+        }
+
+        /* -----------------------------------
+           SLIDE 1: THE SPARK (IDEA)
+        ------------------------------------ */
+        .spark-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--bg-void); /* Pitch black */
+        }
+        
+        /* The glowing center */
+        .idea-core {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .lightbulb {
+            font-size: 90px;
+            color: #FFF;
+            text-shadow: 0 0 40px #FFF, 0 0 80px var(--g-yellow), 0 0 120px var(--g-yellow);
+            animation: pulse-light 2s infinite alternate;
+            z-index: 25;
+        }
+
+        /* Floating Fashion Items */
+        .floating-item {
+            position: absolute;
+            font-size: 45px;
+            filter: drop-shadow(0 0 15px currentColor);
+            opacity: 0.9;
+        }
+        .float-dress { color: var(--neon-pink); top: 10%; left: 10%; animation: float 4s ease-in-out infinite; transform: rotate(-15deg); }
+        .float-shoe { color: var(--neon-cyan); bottom: 10%; right: 10%; animation: float 5s ease-in-out infinite 1s; transform: rotate(20deg); }
+        .float-tie { color: var(--g-green); top: 20%; right: 5%; animation: float 6s ease-in-out infinite 0.5s; transform: rotate(10deg); }
+        .float-glasses { color: var(--g-blue); bottom: 15%; left: 5%; animation: float 4.5s ease-in-out infinite 2s; transform: rotate(-10deg); }
+
+        .spark-slide h1 {
+            background: linear-gradient(to right, var(--g-blue), var(--neon-pink), var(--g-yellow), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-glow 3s linear infinite alternate;
+        }
+        .start-btn {
+            margin-top: 40px;
+            padding: 15px 40px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 30px;
+            color: var(--neon-cyan);
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 0 0 8px var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.3);
+            animation: blink 1.5s infinite;
+        }
+
+        /* -----------------------------------
+           SLIDE 2: THE QUEST (Puzzle Pieces)
+        ------------------------------------ */
+        .puzzle-layout {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Making them look like overlapping puzzle/collage pieces */
+        .puzzle-piece {
+            width: 48%;
+            height: 450px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .piece-problem {
+            transform: translateY(-20px) rotate(-2deg);
+            border-top: 4px solid var(--g-red);
+            background: linear-gradient(135deg, rgba(234, 67, 53, 0.1), rgba(20,20,25,0.8));
+        }
+        .piece-problem:hover { transform: translateY(-30px) rotate(0deg); z-index: 30; }
+        
+        .piece-solution {
+            transform: translateY(20px) rotate(2deg);
+            border-top: 4px solid var(--g-blue);
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(20,20,25,0.8));
+            left: -20px;
+        }
+        .piece-solution:hover { transform: translateY(10px) rotate(0deg); z-index: 30; }
+
+        .puzzle-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px currentColor;
+        }
+        .piece-problem .puzzle-icon { color: var(--g-red); }
+        .piece-solution .puzzle-icon { color: var(--g-blue); }
+
+        .quest-list { list-style: none; margin-top: 20px; }
+        .quest-list li { margin-bottom: 15px; padding-left: 30px; position: relative; }
+        .quest-list li::before {
+            content: "×";
+            position: absolute; left: 0; font-family: 'Space Mono'; font-weight: bold; font-size: 22px;
+        }
+        .piece-problem .quest-list li::before { color: var(--g-red); }
+        .piece-solution .quest-list li::before { content: "✓"; color: var(--g-blue); }
+
+        /* -----------------------------------
+           SLIDE 3: LEVEL 1 - ML PIPELINE
+        ------------------------------------ */
+        .skill-tree {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            height: 100%;
+            position: relative;
+            gap: 20px;
+        }
+        
+        /* The glowing connection line */
+        .skill-tree::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--g-blue), var(--g-red), var(--g-yellow), var(--g-green));
+            z-index: 5;
+            box-shadow: 0 0 15px var(--g-blue);
+        }
+
+        .skill-node {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        /* Staggering the nodes up and down */
+        .skill-node:nth-child(even) { justify-content: flex-start; margin-top: 50px; }
+        .skill-node:nth-child(odd) { justify-content: flex-end; margin-bottom: 50px; }
+
+        .node-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Node connection dots */
+        .node-card::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border-radius: 50%; background: #222; border: 4px solid;
+            left: 50%; transform: translateX(-50%);
+        }
+        .skill-node:nth-child(odd) .node-card::after { top: -45px; }
+        .skill-node:nth-child(even) .node-card::after { bottom: -45px; }
+
+        .n1 .node-card::after { border-color: var(--g-blue); box-shadow: 0 0 10px var(--g-blue); }
+        .n2 .node-card::after { border-color: var(--g-red); box-shadow: 0 0 10px var(--g-red); }
+        .n3 .node-card::after { border-color: var(--g-yellow); box-shadow: 0 0 10px var(--g-yellow); }
+        .n4 .node-card::after { border-color: var(--g-green); box-shadow: 0 0 10px var(--g-green); }
+
+        .node-badge {
+            font-family: 'Space Mono'; color: var(--neon-cyan); font-size: 14px; margin-bottom: 10px;
+        }
+
+        /* Feature Tags inside node 2 */
+        .feature-tags { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .ft-tag {
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 10px; border-radius: 6px; font-size: 13px; font-family: 'Space Mono'; display: flex; align-items: center;
+        }
+        .ft-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; }
+
+        /* -----------------------------------
+           SLIDE 4: INVENTORY / COLLAGE
+        ------------------------------------ */
+        .collage-board {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .polaroid {
+            background: #fff;
+            padding: 15px 15px 35px 15px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: absolute;
+            transition: transform 0.3s;
+        }
+        .polaroid:hover { z-index: 50 !important; transform: scale(1.05) rotate(0deg) !important; }
+        
+        .pol-img {
+            width: 100%;
+            height: 180px;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        .pol-img i { font-size: 60px; }
+        .polaroid p {
+            color: #333; font-family: 'Outfit'; font-weight: 800; font-size: 18px; text-align: center; margin-top: 15px;
+        }
+        .pol-tape {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+            width: 80px; height: 30px; background: rgba(255,255,255,0.4); border-left: 2px dashed rgba(0,0,0,0.1); border-right: 2px dashed rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Polaroid Positions */
+        .p-code1 { width: 300px; top: 20px; left: 50px; transform: rotate(-8deg); z-index: 10;}
+        .p-code1 .pol-img { background: var(--bg-void); color: var(--g-yellow); }
+        
+        .p-fashion { width: 350px; top: 80px; left: 400px; transform: rotate(4deg); z-index: 20;}
+        .p-fashion .pol-img { background: linear-gradient(135deg, var(--neon-pink), var(--g-red)); color: white;}
+        
+        .p-code2 { width: 320px; bottom: 20px; left: 180px; transform: rotate(6deg); z-index: 30;}
+        .p-code2 .pol-img { background: var(--bg-void); color: var(--g-blue); }
+        
+        .p-code3 { width: 340px; top: 40px; right: 50px; transform: rotate(-5deg); z-index: 15;}
+        .p-code3 .pol-img { background: var(--bg-void); color: var(--neon-cyan); }
+
+        /* A glowing tech blueprint window mixed into the collage */
+        .blueprint-card {
+            position: absolute; bottom: 20px; right: 40px; width: 450px;
+            background: rgba(0, 20, 40, 0.8); border: 1px solid var(--neon-cyan);
+            border-radius: 8px; padding: 25px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            transform: rotate(2deg); z-index: 25;
+        }
+        .blueprint-card h3 { color: var(--neon-cyan); font-family: 'Space Mono'; border-bottom: 1px solid var(--neon-cyan); padding-bottom: 10px;}
+        .blueprint-card p { font-size: 16px; color: #add8e6; margin-top: 10px;}
+
+        /* -----------------------------------
+           SLIDE 5: THE MAP (GCP Deployment)
+        ------------------------------------ */
+        .map-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* SVG Map Path */
+        .map-path {
+            position: absolute;
+            top: 50%; left: 100px; right: 100px;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--text-dim) 0, var(--text-dim) 10px, transparent 10px, transparent 20px);
+            z-index: 5;
+            transform: translateY(-50%);
+        }
+
+        .map-point {
+            background: var(--glass-bg);
+            border: 2px solid var(--text-dim);
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            position: relative;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+        
+        .map-point:hover { transform: scale(1.1); box-shadow: 0 0 20px currentColor; }
+        
+        .m1 { color: var(--g-blue); border-color: var(--g-blue); box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);}
+        .m2 { color: var(--g-red); border-color: var(--g-red); box-shadow: 0 0 15px rgba(234, 67, 53, 0.4);}
+        .m3 { color: var(--g-yellow); border-color: var(--g-yellow); box-shadow: 0 0 15px rgba(251, 188, 4, 0.4);}
+        .m4 { color: var(--g-green); border-color: var(--g-green); box-shadow: 0 0 15px rgba(52, 168, 83, 0.4);}
+
+        .map-info {
+            position: absolute;
+            width: 240px;
+            text-align: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+        }
+        .map-point:nth-child(odd) .map-info { top: 120px; }
+        .map-point:nth-child(even) .map-info { bottom: 120px; }
+        
+        .map-info h4 { font-family: 'Space Mono'; font-size: 16px; margin-bottom: 5px; color: #FFF;}
+        .map-info p { font-size: 14px; color: var(--text-dim); }
+
+        /* -----------------------------------
+           SLIDE 6: THE MERCHANT (Pricing)
+        ------------------------------------ */
+        .shop-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+        
+        /* Game Receipt / Inventory Card */
+        .receipt-card {
+            width: 65%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+        
+        .receipt-header {
+            font-family: 'Space Mono';
+            color: var(--neon-cyan);
+            border-bottom: 2px dashed var(--text-dim);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .receipt-table { width: 100%; border-collapse: collapse; font-family: 'Space Mono'; }
+        .receipt-table th { text-align: left; color: var(--text-dim); padding-bottom: 15px; text-transform: uppercase; font-size: 14px;}
+        .receipt-table td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px;}
+        .receipt-table td.cost { color: var(--neon-pink); text-align: right; font-weight: bold;}
+        
+        .total-row td { border-top: 2px dashed var(--text-dim); border-bottom: none; padding-top: 25px; font-size: 24px; color: #FFF; font-weight: 800;}
+        .total-row td.cost { color: var(--g-green); font-size: 30px; text-shadow: 0 0 10px var(--g-green);}
+
+        .shop-character {
+            width: 30%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(255,0,127,0.2), rgba(0,243,255,0.2));
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .shop-character i { font-size: 120px; color: #FFF; filter: drop-shadow(0 0 20px var(--neon-cyan)); margin-bottom: 30px;}
+        .shop-character p { text-align: center; font-family: 'Space Mono'; font-size: 14px; color: var(--text-dim);}
+
+        /* -----------------------------------
+           SLIDE 7: MISSION COMPLETE (Q&A)
+        ------------------------------------ */
+        .victory-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(52, 168, 83, 0.2) 0%, var(--bg-void) 70%);
+        }
+        
+        .victory-text {
+            font-size: 100px;
+            font-family: 'Righteous', cursive;
+            background: linear-gradient(to bottom, #FFF, var(--g-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(52, 168, 83, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .stats-board {
+            background: var(--glass-bg);
+            border: 1px solid var(--g-green);
+            padding: 40px 60px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 0 30px rgba(52, 168, 83, 0.2);
+            text-align: left;
+            font-family: 'Space Mono';
+        }
+        .stats-board p { font-size: 20px; margin-bottom: 20px; color: #FFF; display: flex; align-items: center;}
+        .stats-board p:last-child { margin-bottom: 0; }
+        .stats-board i { width: 40px; color: var(--neon-cyan); font-size: 24px;}
+
+        /* Animations */
+        @keyframes pulse-light {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.1); filter: brightness(1.3); }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @keyframes text-glow {
+            0% { filter: drop-shadow(0 0 5px rgba(0,243,255,0.5)); }
+            100% { filter: drop-shadow(0 0 20px rgba(0,243,255,0.8)); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         SLIDE 1: THE SPARK (IDEA)
+    =========================================== -->
+    <div class="slide spark-slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        
+        <div class="idea-core">
+            <i class="fa-solid fa-lightbulb lightbulb"></i>
+            
+            <!-- Colorful floating fashion items illuminating the dark -->
+            <i class="fa-solid fa-shirt floating-item float-dress"></i>
+            <i class="fa-solid fa-shoe-prints floating-item float-shoe"></i>
+            <i class="fa-solid fa-tie floating-item float-tie"></i>
+            <i class="fa-solid fa-glasses floating-item float-glasses"></i>
+        </div>
+
+        <div class="code-font" style="margin-bottom: 10px;">// SYSTEM INITIALIZED</div>
+        <h1>Fashion Finder</h1>
+        <p style="font-size: 22px; color: #FFF; letter-spacing: 4px; text-transform: uppercase;">AI-Powered Semantic Search</p>
+        
+        <div class="start-btn">PRESS START</div>
+        <p style="margin-top: 20px; font-family: 'Space Mono'; font-size: 12px;">Arash Karimi - Pardis Attarsadegh</p>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 2: THE QUEST (Puzzle Pieces)
+    =========================================== -->
+    <div class="slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        <div class="code-font">MISSION_LOG // 01</div>
+        <h2 class="slide-title">The Search Quest</h2>
+        
+        <div class="puzzle-layout">
+            
+            <!-- Problem Piece -->
+            <div class="glass-panel puzzle-piece piece-problem">
+                <i class="fa-solid fa-triangle-exclamation puzzle-icon"></i>
+                <h3>The Broken System</h3>
+                <p>Searching for clothing online is heavily reliant on manual keywords and rigid tagging systems.</p>
+                <ul class="quest-list">
+                    <li><strong>Keyword Failure:</strong> "Blue casual top" returns thousands of irrelevant results.</li>
+                    <li><strong>Lost Context:</strong> Users know what they want visually, but can't type it.</li>
+                    <li><strong>Bad UX:</strong> Rigid filters fail to capture style or silhouette.</li>
+                </ul>
+            </div>
+            
+            <!-- Solution Piece -->
+            <div class="glass-panel puzzle-piece piece-solution">
+                <i class="fa-solid fa-wand-magic-sparkles puzzle-icon"></i>
+                <h3>The Semantic Solution</h3>
+                <p>Replacing text guesswork with absolute visual precision and AI feature extraction.</p>
+                <ul class="quest-list">
+                    <li><strong>See It, Find It:</strong> Upload a photo to retrieve visual matches instantly.</li>
+                    <li><strong>Deep Understanding:</strong> The AI analyzes garment color, texture, and fit dynamically.</li>
+                    <li><strong>Beyond Tags:</strong> Recognizes abstract concepts like style and formality automatically.</li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 3: LEVEL 1 - ML PIPELINE
+    =========================================== -->
+    <div class="slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        <div class="code-font">SYS_ARCHITECTURE // ML_PIPELINE</div>
+        <h2 class="slide-title">Level 1: Feature Extraction</h2>
+        
+        <div class="skill-tree">
+            
+            <div class="skill-node n1">
+                <div class="node-card">
+                    <div class="node-badge">NODE_01</div>
+                    <i class="fa-solid fa-crop-simple" style="font-size: 30px; color: var(--g-blue); margin-bottom: 10px;"></i>
+                    <h3>Pre-Processing</h3>
+                    <p>Isolating the garment from noise using <strong>rembg (U²-Net)</strong>.</p>
+                </div>
+            </div>
+
+            <div class="skill-node n2">
+                <div class="node-card" style="width: 320px;">
+                    <div class="node-badge">NODE_02</div>
+                    <i class="fa-solid fa-microchip" style="font-size: 30px; color: var(--g-red); margin-bottom: 10px;"></i>
+                    <h3>Extraction</h3>
+                    <p>Breaking down mathematical properties:</p>
+                    <div class="feature-tags">
+                        <div class="ft-tag"><div class="ft-dot" style="background: var(--g-blue);"></div>Visual: FashionCLIP (512d)</div>
+                        <div class="ft-tag"><div class="ft-dot" style="background: var(--g-red);"></div>Texture: Gabor filter (36d)</div>
+                        <div class="ft-tag"><div class="ft-dot" style="background: var(--g-yellow);"></div>Color: CIELAB space (3d)</div>
+                        <div class="ft-tag"><div class="ft-dot" style="background: var(--g-green);"></div>Shape: PCA (20d)</div>
+                        <div class="ft-tag"><div class="ft-dot" style="background: var(--neon-pink);"></div>Semantics: Rule-based (4d)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skill-node n3">
+                <div class="node-card">
+                    <div class="node-badge">NODE_03</div>
+                    <i class="fa-solid fa-cubes-stacked" style="font-size: 30px; color: var(--g-yellow); margin-bottom: 10px;"></i>
+                    <h3>Vectorization</h3>
+                    <p>Fusing all features into a unified <strong>583-dimensional array</strong>.</p>
+                </div>
+            </div>
+
+            <div class="skill-node n4">
+                <div class="node-card">
+                    <div class="node-badge">NODE_04</div>
+                    <i class="fa-solid fa-database" style="font-size: 30px; color: var(--g-green); margin-bottom: 10px;"></i>
+                    <h3>Vector DB</h3>
+                    <p>Cosine Similarity search across 10,000+ items in <strong>Pinecone</strong>.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 4: INVENTORY / COLLAGE
+    =========================================== -->
+    <div class="slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        <div class="code-font">INVENTORY // TOOLS_AND_STACK</div>
+        <h2 class="slide-title">Crafting the Codebase</h2>
+        
+        <div class="collage-board">
+            
+            <div class="polaroid p-code1">
+                <div class="pol-tape"></div>
+                <div class="pol-img"><i class="fa-solid fa-bolt"></i></div>
+                <p>uv Manager</p>
+            </div>
+            
+            <div class="polaroid p-fashion">
+                <div class="pol-tape"></div>
+                <div class="pol-img"><i class="fa-solid fa-shirt"></i></div>
+                <p>Fashion Deep Learning</p>
+            </div>
+
+            <div class="polaroid p-code2">
+                <div class="pol-tape"></div>
+                <div class="pol-img"><i class="fa-solid fa-file-code"></i></div>
+                <p>pyproject.toml</p>
+            </div>
+
+            <div class="polaroid p-code3">
+                <div class="pol-tape"></div>
+                <div class="pol-img"><i class="fa-brands fa-docker"></i></div>
+                <p>Dockerized Env</p>
+            </div>
+
+            <div class="blueprint-card">
+                <h3>// SYSTEM_SPECS.TXT</h3>
+                <p>&gt; Modern 'uv' ecosystem used for blazing-fast Python environments, bypassing pip bottlenecks.</p>
+                <p>&gt; Standardized dependencies via pyproject.toml for robust ML requirement syncing.</p>
+                <p>&gt; Packaged into an isolated Docker container configured for serverless external traffic.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 5: THE MAP (GCP Deployment)
+    =========================================== -->
+    <div class="slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        <div class="code-font">WORLD_MAP // GCP_DEPLOYMENT</div>
+        <h2 class="slide-title">The Cloud Journey</h2>
+        
+        <div class="map-container">
+            <div class="map-path"></div>
+            
+            <div class="map-point m1">
+                <i class="fa-solid fa-terminal"></i>
+                <div class="map-info">
+                    <h4 style="color: var(--g-blue);">01. VM Connection</h4>
+                    <p>Established VS Code Remote-SSH directly into a Google Compute Engine VM.</p>
+                </div>
+            </div>
+
+            <div class="map-point m2">
+                <i class="fa-solid fa-shield-halved"></i>
+                <div class="map-info">
+                    <h4 style="color: var(--g-red);">02. IAM Security</h4>
+                    <p>Bypassed strict default limits by authenticating with master terminal privileges.</p>
+                </div>
+            </div>
+
+            <div class="map-point m3">
+                <i class="fa-solid fa-network-wired"></i>
+                <div class="map-info">
+                    <h4 style="color: var(--g-yellow);">03. Port Routing</h4>
+                    <p>Updated Dockerfile to bind Uvicorn to <code>0.0.0.0</code> and capture <code>PORT</code> vars.</p>
+                </div>
+            </div>
+
+            <div class="map-point m4">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div class="map-info">
+                    <h4 style="color: var(--g-green);">04. Cloud Run</h4>
+                    <p>Executed source deploy for auto-scaling serverless web hosting.</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 6: THE MERCHANT (Pricing)
+    =========================================== -->
+    <div class="slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        <div class="code-font">MERCHANT // RESOURCE_COSTS</div>
+        <h2 class="slide-title">Cloud Economics</h2>
+        
+        <div class="shop-layout">
+            
+            <div class="receipt-card">
+                <div class="receipt-header">
+                    <span>GCP_RESOURCE_REQ</span>
+                    <span>MONTHLY_ESTIMATE</span>
+                </div>
+                <table class="receipt-table">
+                    <tbody><tr>
+                        <th>Service / Item</th>
+                        <th>Purpose</th>
+                        <th style="text-align: right;">Cost</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloud Run</strong></td>
+                        <td>Host API &amp; Frontend</td>
+                        <td class="cost">~$3.53</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Artifact Registry</strong></td>
+                        <td>Store Docker Images</td>
+                        <td class="cost">~$1.10</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloud Storage</strong></td>
+                        <td>Serve Product Assets</td>
+                        <td class="cost">~$0.46</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pinecone (Ext)</strong></td>
+                        <td>Vector DB (Free Tier)</td>
+                        <td class="cost">$0.00</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2">TOTAL RUNTIME COST:</td>
+                        <td class="cost">~$5.09</td>
+                    </tr>
+                </tbody></table>
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-dim); font-family: 'Space Mono';">* Scales to zero when idle. Based on ~1,000 active users/day.</p>
+            </div>
+            
+            <div class="shop-character">
+                <i class="fa-solid fa-wallet"></i>
+                <p>&gt; PAY ONLY FOR</p>
+                <p>&gt; WHAT YOU USE.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 7: MISSION COMPLETE (Q&A)
+    =========================================== -->
+    <div class="slide victory-slide"><canvas class="glitter-canvas" width="1280" height="720"></canvas>
+        
+        <div class="code-font" style="margin-bottom: 10px; color: var(--g-green);">// EXECUTION_SUCCESSFUL</div>
+        <div class="victory-text">MISSION CLEARED</div>
+        <p style="font-size: 28px; color: #FFF; font-weight: 800;">Thank you for playing.</p>
+        
+        <div class="stats-board">
+            <p><i class="fa-solid fa-code-branch"></i> <strong>REPO:</strong> github.com/pardisattar/Google-Cloud-Hackathon</p>
+            
+            <p><i class="fa-brands fa-google" style="color: var(--g-red);"></i> <strong>HOST:</strong> Google Cloud Platform</p>
+            <p style="color: var(--g-yellow); margin-top: 20px; text-align: center; display: block; font-size: 24px; font-weight: bold;">PRESS [Q] FOR QUESTIONS</p>
+        </div>
+
+    </div>
+
+    <!-- INTERACTIVE GLITTER SCRIPT -->
+    <script>
+        // Array of neon colors (R, G, B) to cycle through for each slide
+        const glitterColors = [
+            '0, 243, 255',    // 1: Neon Cyan
+            '255, 0, 127',    // 2: Neon Pink
+            '251, 188, 4',    // 3: Google Yellow
+            '66, 133, 244',   // 4: Google Blue
+            '234, 67, 53',    // 5: Google Red
+            '176, 38, 255',   // 6: Electric Purple
+            '52, 168, 83'     // 7: Google Green
+        ];
+
+        document.querySelectorAll('.slide').forEach((slide, index) => {
+            // Create a canvas and inject it as the first child of the slide
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('glitter-canvas');
+            slide.insertBefore(canvas, slide.firstChild);
+
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            
+            // Assign the color based on the slide index
+            const rgbColor = glitterColors[index % glitterColors.length];
+
+            function resize() {
+                width = slide.clientWidth;
+                height = slide.clientHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Initialize Particles
+            const particles = [];
+            const numParticles = 120; // Density of the glitter
+
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    // Base state: small and dim
+                    baseRadius: Math.random() * 1.5 + 0.5,
+                    baseAlpha: Math.random() * 0.4 + 0.1,
+                    // Subtle drifting movement
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3
+                });
+            }
+
+            // Mouse tracking relative to the specific slide
+            let mouse = { x: -1000, y: -1000 };
+            
+            slide.addEventListener('mousemove', (e) => {
+                const rect = slide.getBoundingClientRect();
+                mouse.x = e.clientX - rect.left;
+                mouse.y = e.clientY - rect.top;
+            });
+            
+            slide.addEventListener('mouseleave', () => {
+                mouse.x = -1000;
+                mouse.y = -1000;
+            });
+
+            // Animation Loop
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                particles.forEach(p => {
+                    // Move particles
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Wrap around edges
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+
+                    // Calculate distance to mouse
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    let radius = p.baseRadius;
+                    let alpha = p.baseAlpha;
+                    let glow = 0;
+
+                    // Interaction Radius: If mouse is close, grow and glow!
+                    const hoverDist = 180; 
+                    if (dist < hoverDist) {
+                        const intensity = 1 - (dist / hoverDist); // 0 to 1 based on proximity
+                        radius += intensity * 3.5; // Grow larger
+                        alpha += intensity * 0.8;  // Become much brighter
+                        glow = intensity * 20;     // Add neon shadow blur
+                    }
+
+                    if (alpha > 1) alpha = 1;
+
+                    // Draw the particle
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${rgbColor}, ${alpha})`;
+                    
+                    if (glow > 0) {
+                        ctx.shadowBlur = glow;
+                        ctx.shadowColor = `rgb(${rgbColor})`;
+                    } else {
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+    </script>
+
+
+</body></html>
