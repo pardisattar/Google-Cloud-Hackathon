@@ -113,7 +113,7 @@ app.include_router(images_router, prefix="")
 # ---------------------------------------------------------------------------
 import os  # noqa: E402
 
-_FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend")
+_FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
 _FRONTEND_DIR = os.path.abspath(_FRONTEND_DIR)
 
 if os.path.isdir(_FRONTEND_DIR):
